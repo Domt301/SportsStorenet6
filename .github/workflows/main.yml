@@ -15,31 +15,15 @@ on:
 
 jobs:
   D365_action:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: Connect and publish customizations in source D365 environment
-        uses: microsoft/powerplatform-actions/msdynce-devops@v0.10.8
-        with:
-          environment-url: ${{ github.event.inputs.sourceEnvUrl }}
-          user-name: ${{ github.event.inputs.sourceUserName }}
-          password-secret: ${{ secrets.SOURCE_PASSWORD }}
-          command: "pac admin ${{ github.event.inputs.sourceEnvUrl }} publishxml"
-
-      - name: Export solution from source D365 environment
-        uses: microsoft/powerplatform-actions/msdynce-devops@v0.10.8
-        with:
-          environment-url: ${{ github.event.inputs.sourceEnvUrl }}
-          user-name: ${{ github.event.inputs.sourceUserName }}
-          password-secret: ${{ secrets.SOURCE_PASSWORD }}
-          command: "pac solution export --path ./ --name ${{ github.event.inputs.solutionName }}"
-
-#       - name: Connect to target D365 environment and import solution
-#         uses: microsoft/powerplatform-actions/msdynce-devops@v0.10.8
-#         with:
-#           environment-url: ${{ secrets.TARGET_ENV_URL }}
-#           user-name: ${{ secrets.TARGET_USER_NAME }}
-#           password-secret: ${{ secrets.TARGET_PASSWORD }}
-#           command: "pac solution import --path ./ --name ${{ github.event.inputs.solutionName }}"
+      - name: Run PowerShell script
+        run: |
+          $env:SOLUTION_NAME = "${{ github.event.inputs.solutionName }}"
+          $env:SOURCE_ENV_URL = "${{ github.event.inputs.sourceEnvUrl }}"
+          $env:SOURCE_USERNAME = "${{ github.event.inputs.sourceUserName }}"
+          $env:SOURCE_PASSWORD = "${{ secrets.SOURCE_PASSWORD }}"
+          .\.github\scripts\run-d365-operations.ps1
