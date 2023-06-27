@@ -1,4 +1,4 @@
-# SportsStore: An ASP.NET Core MVC Project 
+# SportsStore: An ASP.NET Core MVC Project [![.NET](https://github.com/Domt301/SportsStorenet6/actions/workflows/dotnet.yml/badge.svg)](https://github.com/Domt301/SportsStorenet6/actions/workflows/dotnet.yml)
 
 Welcome to the SportsStore project, a web application built using ASP.NET Core 6. This project is an e-commerce web application for a sports store, and demonstrates various aspects of ASP.NET Core and Entity Framework Core.
 
