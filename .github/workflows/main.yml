@@ -39,18 +39,18 @@ jobs:
           solution-name: ${{ github.event.inputs.solutionName }}
           output-file: 'solution.zip'
 
-      - name: Connect to target D365 environment
-        id: connect-to-target-env
-        uses: microsoft/powerplatform-actions@v0.10.8
-        with:
-          environment-url: ${{ secrets.TARGET_ENV_URL }}
-          user-name: ${{ secrets.TARGET_USER_NAME }}
-          password-secret: ${{ secrets.TARGET_PASSWORD }}
+#       - name: Connect to target D365 environment
+#         id: connect-to-target-env
+#         uses: microsoft/powerplatform-actions@v0.10.8
+#         with:
+#           environment-url: ${{ secrets.TARGET_ENV_URL }}
+#           user-name: ${{ secrets.TARGET_USER_NAME }}
+#           password-secret: ${{ secrets.TARGET_PASSWORD }}
 
-      - name: Import solution
-        uses: microsoft/powerplatform-actions/import-solution@v0.10.8
-        with:
-          environment-url: ${{ secrets.TARGET_ENV_URL }}
-          user-name: ${{ secrets.TARGET_USER_NAME }}
-          password-secret: ${{ secrets.TARGET_PASSWORD }}
-          solution-file: 'solution.zip'
+#       - name: Import solution
+#         uses: microsoft/powerplatform-actions/import-solution@v0.10.8
+#         with:
+#           environment-url: ${{ secrets.TARGET_ENV_URL }}
+#           user-name: ${{ secrets.TARGET_USER_NAME }}
+#           password-secret: ${{ secrets.TARGET_PASSWORD }}
+#           solution-file: 'solution.zip'
