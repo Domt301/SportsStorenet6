@@ -33,20 +33,20 @@ jobs:
       uses: microsoft/powerplatform-actions/who-am-i@v0
       with:
         environment-url: ${{ github.event.inputs.source_environment_url }}
-        username: ${{ github.event.inputs.source_username }}
-        password: ${{ secrets.SOURCE_PASSWORD }}
+        user-name: ${{ github.event.inputs.source_username }}
+        password-secret: ${{ secrets.SOURCE_PASSWORD }}
     - name: Publish all customizations
       uses: microsoft/powerplatform-actions/publish-solution@v0
       with:
         environment-url: ${{ github.event.inputs.source_environment_url }}
-        username: ${{ github.event.inputs.source_username }}
-        password: ${{ secrets.SOURCE_PASSWORD }}
+        user-name: ${{ github.event.inputs.source_username }}
+        password-secret: ${{ secrets.SOURCE_PASSWORD }}
     - name: Export solution from source environment
       uses: microsoft/powerplatform-actions/export-solution@v0
       with:
           environment-url: ${{ github.event.inputs.source_environment_url }}
-          username: ${{ github.event.inputs.source_username }}
-          password: ${{ secrets.SOURCE_PASSWORD }}
+          user-name: ${{ github.event.inputs.source_username }}
+          password-secret: ${{ secrets.SOURCE_PASSWORD }}
           solution-name: ${{ github.event.inputs.solution_name }}
           solution-output-file: "./${{ github.event.inputs.solution_name }}.zip"
     - name: Upload exported solution as artifact
