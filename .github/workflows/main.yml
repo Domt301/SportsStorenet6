@@ -1,29 +1,78 @@
 name: D365 Pipeline
 
-on:
+on:  
   workflow_dispatch:
-    inputs:
-      solutionName:
-        description: 'Solution name'
+    inputs:  
+      solution_name:  
+        description: 'Name of the solution to be exported from D365 and imported into another environment'  
+        required: true  
+      source_environment_url:  
+        description: 'URL of the source D365 environment'  
         required: true
-      sourceEnvUrl:
-        description: 'Source environment URL'
+      # target_environment_url:  
+      #   description: 'URL of the target D365 environment'  
+      #   required: true
+      source_username:
+        description: 'Username for the source D365 environment'
         required: true
-      sourceUserName:
-        description: 'Source username'
-        required: true
+      # target_username:
+      #   description: 'Username for the target D365 environment'
+      #   required: true
 
 jobs:
-  D365_action:
-    runs-on: windows-latest
+  export-from-source:
+    runs-on: ubuntu-latest  
+    env:
+      RUNNER_DEBUG: 1
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
+    - uses: actions/checkout@v2
+      with:
+        lfs: true
+    - name: Authenticate with source environment
+      uses: microsoft/powerplatform-actions/who-am-i@v0
+      with:
+        environment-url: ${{ github.event.inputs.source_environment_url }}
+        username: ${{ github.event.inputs.source_username }}
+        password: ${{ secrets.SOURCE_PASSWORD }}
+    - name: Publish all customizations
+      uses: microsoft/powerplatform-actions/publish-customizations@v0
+      with:
+        environment-url: ${{ github.event.inputs.source_environment_url }}
+        username: ${{ github.event.inputs.source_username }}
+        password: ${{ secrets.SOURCE_PASSWORD }}
+    - name: Export solution from source environment
+      uses: microsoft/powerplatform-actions/export-solution@v0
+      with:
+          environment-url: ${{ github.event.inputs.source_environment_url }}
+          username: ${{ github.event.inputs.source_username }}
+          password: ${{ secrets.SOURCE_PASSWORD }}
+          solution-name: ${{ github.event.inputs.solution_name }}
+          solution-output-file: "./${{ github.event.inputs.solution_name }}.zip"
+    - name: Upload exported solution as artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: exportedSolution
+        path: "./${{ github.event.inputs.solution_name }}.zip"
 
-      - name: Run PowerShell script
-        run: |
-          $env:SOLUTION_NAME = "${{ github.event.inputs.solutionName }}"
-          $env:SOURCE_ENV_URL = "${{ github.event.inputs.sourceEnvUrl }}"
-          $env:SOURCE_USERNAME = "${{ github.event.inputs.sourceUserName }}"
-          $env:SOURCE_PASSWORD = "${{ secrets.SOURCE_PASSWORD }}"
-          .\.github\scripts\run-d365-operations.ps1
+  # import-to-target:
+  #   needs: [export-from-source]
+  #   runs-on: ubuntu-latest  
+  #   env:
+  #     RUNNER_DEBUG: 1
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #     with:
+  #       lfs: true
+  #   - name: Download exported solution
+  #     uses: actions/download-artifact@v2
+  #     with:
+  #       name: exportedSolution
+  #       path: "./"
+  #   - name: Import solution to target environment
+  #     uses: microsoft/powerplatform-actions/import-solution@v0
+  #     with:
+  #       environment-url: ${{ github.event.inputs.target_environment_url }}
+  #       username: ${{ github.event.inputs.target_username }}
+  #       password: ${{ secrets.TARGET_PASSWORD }}
+  #       solution-file: "./${{ github.event.inputs.solution_name }}.zip"
+  #       force-overwrite: true
