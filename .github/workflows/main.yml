@@ -36,7 +36,7 @@ jobs:
         username: ${{ github.event.inputs.source_username }}
         password: ${{ secrets.SOURCE_PASSWORD }}
     - name: Publish all customizations
-      uses: microsoft/powerplatform-actions/publish-customizations@v0
+      uses: microsoft/powerplatform-actions/publish-solution@v0
       with:
         environment-url: ${{ github.event.inputs.source_environment_url }}
         username: ${{ github.event.inputs.source_username }}
