@@ -1,0 +1,56 @@
+name: D365 Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      solutionName:
+        description: 'Solution name'
+        required: true
+
+jobs:
+  D365_action:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Connect to source D365 environment
+        id: connect-to-source-env
+        uses: microsoft/powerplatform-actions@v0.10.8
+        with:
+          environment-url: ${{ secrets.SOURCE_ENV_URL }}
+          user-name: ${{ secrets.SOURCE_USER_NAME }}
+          password-secret: ${{ secrets.SOURCE_PASSWORD }}
+
+      - name: Publish all customizations
+        uses: microsoft/powerplatform-actions/publish-customizations@v0.10.8
+        with:
+          environment-url: ${{ secrets.SOURCE_ENV_URL }}
+          user-name: ${{ secrets.SOURCE_USER_NAME }}
+          password-secret: ${{ secrets.SOURCE_PASSWORD }}
+
+      - name: Export solution
+        id: export-solution
+        uses: microsoft/powerplatform-actions/export-solution@v0.10.8
+        with:
+          environment-url: ${{ secrets.SOURCE_ENV_URL }}
+          user-name: ${{ secrets.SOURCE_USER_NAME }}
+          password-secret: ${{ secrets.SOURCE_PASSWORD }}
+          solution-name: ${{ github.event.inputs.solutionName }}
+          output-file: 'solution.zip'
+
+      - name: Connect to target D365 environment
+        id: connect-to-target-env
+        uses: microsoft/powerplatform-actions@v0.10.8
+        with:
+          environment-url: ${{ secrets.TARGET_ENV_URL }}
+          user-name: ${{ secrets.TARGET_USER_NAME }}
+          password-secret: ${{ secrets.TARGET_PASSWORD }}
+
+      - name: Import solution
+        uses: microsoft/powerplatform-actions/import-solution@v0.10.8
+        with:
+          environment-url: ${{ secrets.TARGET_ENV_URL }}
+          user-name: ${{ secrets.TARGET_USER_NAME }}
+          password-secret: ${{ secrets.TARGET_PASSWORD }}
+          solution-file: 'solution.zip'
