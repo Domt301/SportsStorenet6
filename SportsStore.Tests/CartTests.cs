@@ -57,7 +57,7 @@ namespace SportsStore.Tests {
             Product p3 = new Product { ProductID = 3, Name = "P3" };
 
             // Arrange - create a new cart
-            Cart target = new();
+            Cart target = new Cart();
             // Arrange - add some products to the cart
             target.AddItem(p1, 1);
             target.AddItem(p2, 3);
