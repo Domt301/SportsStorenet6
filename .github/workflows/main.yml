@@ -25,7 +25,8 @@ jobs:
     env:
       RUNNER_DEBUG: 1
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout Code
+      uses: actions/checkout@v2
       with:
         lfs: true
     - name: Authenticate with source environment
