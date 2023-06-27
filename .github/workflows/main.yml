@@ -9,15 +9,15 @@ on:
       source_environment_url:  
         description: 'URL of the source D365 environment'  
         required: true
-      # target_environment_url:  
-      #   description: 'URL of the target D365 environment'  
-      #   required: true
+      target_environment_url:  
+        description: 'URL of the target D365 environment'  
+        required: true
       source_username:
         description: 'Username for the source D365 environment'
         required: true
-      # target_username:
-      #   description: 'Username for the target D365 environment'
-      #   required: true
+      target_username:
+        description: 'Username for the target D365 environment'
+        required: true
 
 jobs:
   export-from-source:
@@ -55,25 +55,25 @@ jobs:
         name: exportedSolution
         path: "./${{ github.event.inputs.solution_name }}.zip"
 
-  # import-to-target:
-  #   needs: [export-from-source]
-  #   runs-on: ubuntu-latest  
-  #   env:
-  #     RUNNER_DEBUG: 1
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #     with:
-  #       lfs: true
-  #   - name: Download exported solution
-  #     uses: actions/download-artifact@v2
-  #     with:
-  #       name: exportedSolution
-  #       path: "./"
-  #   - name: Import solution to target environment
-  #     uses: microsoft/powerplatform-actions/import-solution@v0
-  #     with:
-  #       environment-url: ${{ github.event.inputs.target_environment_url }}
-  #       username: ${{ github.event.inputs.target_username }}
-  #       password: ${{ secrets.TARGET_PASSWORD }}
-  #       solution-file: "./${{ github.event.inputs.solution_name }}.zip"
-  #       force-overwrite: true
+  import-to-target:
+    needs: [export-from-source]
+    runs-on: ubuntu-latest  
+    env:
+      RUNNER_DEBUG: 1
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        lfs: true
+    - name: Download exported solution
+      uses: actions/download-artifact@v2
+      with:
+        name: exportedSolution
+        path: "./"
+    - name: Import solution to target environment
+      uses: microsoft/powerplatform-actions/import-solution@v0
+      with:
+        environment-url: ${{ github.event.inputs.target_environment_url }}
+        user-name: ${{ github.event.inputs.target_username }}
+        password-secret: ${{ secrets.TARGET_PASSWORD }}
+        solution-file: "./${{ github.event.inputs.solution_name }}.zip"
+        force-overwrite: true
