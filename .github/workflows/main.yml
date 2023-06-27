@@ -12,9 +12,6 @@ on:
       sourceUserName:
         description: 'Source username'
         required: true
-      sourcePassword:
-        description: 'Source password'
-        required: true
 
 jobs:
   D365_action:
@@ -23,43 +20,26 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: Connect to source D365 environment
-        id: connect-to-source-env
-        uses: microsoft/powerplatform-actions@v0.10.8
+      - name: Connect and publish customizations in source D365 environment
+        uses: microsoft/powerplatform-actions/msdynce-devops@v0.10.8
         with:
           environment-url: ${{ github.event.inputs.sourceEnvUrl }}
           user-name: ${{ github.event.inputs.sourceUserName }}
-          password: ${{ github.event.inputs.sourcePassword }}
+          password-secret: ${{ secrets.SOURCE_PASSWORD }}
+          command: "pac admin ${{ github.event.inputs.sourceEnvUrl }} publishxml"
 
-      - name: Publish all customizations
-        uses: microsoft/powerplatform-actions/publish-customizations@v0.10.8
+      - name: Export solution from source D365 environment
+        uses: microsoft/powerplatform-actions/msdynce-devops@v0.10.8
         with:
           environment-url: ${{ github.event.inputs.sourceEnvUrl }}
           user-name: ${{ github.event.inputs.sourceUserName }}
-          password: ${{ github.event.inputs.sourcePassword }}
+          password-secret: ${{ secrets.SOURCE_PASSWORD }}
+          command: "pac solution export --path ./ --name ${{ github.event.inputs.solutionName }}"
 
-      - name: Export solution
-        id: export-solution
-        uses: microsoft/powerplatform-actions/export-solution@v0.10.8
-        with:
-          environment-url: ${{ github.event.inputs.sourceEnvUrl }}
-          user-name: ${{ github.event.inputs.sourceUserName }}
-          password: ${{ github.event.inputs.sourcePassword }}
-          solution-name: ${{ github.event.inputs.solutionName }}
-          output-file: 'solution.zip'
-
-#       - name: Connect to target D365 environment
-#         id: connect-to-target-env
-#         uses: microsoft/powerplatform-actions@v0.10.8
+#       - name: Connect to target D365 environment and import solution
+#         uses: microsoft/powerplatform-actions/msdynce-devops@v0.10.8
 #         with:
 #           environment-url: ${{ secrets.TARGET_ENV_URL }}
 #           user-name: ${{ secrets.TARGET_USER_NAME }}
 #           password-secret: ${{ secrets.TARGET_PASSWORD }}
-
-#       - name: Import solution
-#         uses: microsoft/powerplatform-actions/import-solution@v0.10.8
-#         with:
-#           environment-url: ${{ secrets.TARGET_ENV_URL }}
-#           user-name: ${{ secrets.TARGET_USER_NAME }}
-#           password-secret: ${{ secrets.TARGET_PASSWORD }}
-#           solution-file: 'solution.zip'
+#           command: "pac solution import --path ./ --name ${{ github.event.inputs.solutionName }}"
